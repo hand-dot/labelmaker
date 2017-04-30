@@ -12,7 +12,7 @@
             <div class="col-xs-6">
               <label>テンプレートを選択</label>
               <select name="template" v-model="selected"　@change="selectTemplate" class="form-control">
-                      <option value="letterPack">レターパック</option>
+                      <option value="letterpack">レターパック</option>
                     </select>
             </div>
             <div class="col-xs-6">
@@ -68,16 +68,16 @@
   import 'bootstrap/dist/css/bootstrap.css'
   import Handsontable from 'handsontable/dist/handsontable.full.js'
   import 'handsontable/dist/handsontable.full.min.css'
-  import letterPack from './table_settings/letter-pack'
+  import letterpack from './table_settings/letter-pack'
   let hot;
   export default {
     name: 'app',
     data() {
       return {
-        selected: 'letterPack',
+        selected: 'letterpack',
         nowSetting: {
-            columns: letterPack.columns,
-            colHeaders: letterPack.colHeaders         
+            columns: letterpack.columns,
+            colHeaders: letterpack.colHeaders         
         },
         pdfDatas:[],
         smallModalText:''
@@ -94,9 +94,9 @@
       },
       selectTemplate: function() {
            //テンプレートの数だけここが増える
-          if (this.selected === 'letterPack') {
-            this.nowSetting.columns = letterPack.columns;
-            this.nowSetting.colHeaders = letterPack.colHeaders;
+          if (this.selected === 'letterpack') {
+            this.nowSetting.columns = letterpack.columns;
+            this.nowSetting.colHeaders = letterpack.colHeaders;
           }
           this.updateTableSettings();           
       },
@@ -122,12 +122,9 @@
         $('#confirmation').modal('hide');
         if(!_.isEmpty(this.pdfDatas)){
           $.ajax({
-              type:'post',
-              url:'/path/to/post',
+              type: 'POST', 
+              url:'/api/v1/letterpack',
               data:JSON.stringify(self.pdfDatas),
-              contentType: 'application/json',
-              dataType : 'text',
-              contentType : 'application/pdf',
               success: function(response) {
                 this.smallModalText = 'PDFを作成が完了しました。'
               },
