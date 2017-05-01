@@ -22,3 +22,9 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+
+### Eclipse ###
+.metadata/
+
+### npm ###
+npm-debug.log
