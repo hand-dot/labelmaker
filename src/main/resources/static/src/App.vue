@@ -118,13 +118,15 @@
       },
       createPDF: function() {
         this.smallModalText = '';
-        console.log(this.pdfDatas);
+        console.log(JSON.stringify(this.pdfDatas));
         $('#confirmation').modal('hide');
         if(!_.isEmpty(this.pdfDatas)){
           $.ajax({
               type: 'POST', 
               url:'/api/v1/letterpack',
-              data:JSON.stringify(self.pdfDatas),
+              dataType: 'json', 
+              contentType: 'application/json',
+              data:JSON.stringify(this.pdfDatas),
               success: function(response) {
                 this.smallModalText = 'PDFを作成が完了しました。'
               },
