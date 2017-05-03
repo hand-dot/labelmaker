@@ -1,8 +1,8 @@
-package com.hand.dot.dto;
+package com.hand.dot.data.templates;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class LetterPackDto {
+public class LetterPack {
 
 	//[届け先]郵便番号
 	private String toPost;

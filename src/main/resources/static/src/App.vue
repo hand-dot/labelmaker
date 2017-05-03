@@ -138,7 +138,7 @@
                 $('#small-modal').modal('show');
               },
               complete: function() {
-                $('#small-modal').modal('hide');
+                //$('#small-modal').modal('hide');
               }
           });
         }else{
