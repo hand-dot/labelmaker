@@ -1,0 +1,97 @@
+<configuration>
+
+    <!-- jul-to-slf4j の対応 ここから -->
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+    <!-- ここまで -->
+
+    <property name="home" value="/opt/report-server"/>
+    <timestamp key="timestamp" datePattern="yyyyMMdd'T'HHmmss"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%d{yyyy/MM/dd HH:mm:ss.SSS} [%-5level] [%thread] [%logger] %file:%line - %msg%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>TRACE</level>
+        </filter>
+    </appender>
+
+
+    <!--
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+            <file>${home}/log/${processName}-${timestamp}.log</file>
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                    <level>TRACE</level>
+            </filter>
+            <encoder>
+                    <pattern>%d{yyyy/MM/dd HH:mm:ss.SSS} [%-5level] [%thread] [%logger] %file:%line - %msg%n</pattern>
+            </encoder>
+    </appender>
+    -->
+
+    <appender name="ROLLING_FILE"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${home}/log/report-server.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>TRACE</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${home}/log/report-server.log.%d{yyyyMMdd}
+            </fileNamePattern>
+            <!-- keep 93 days' worth of history 20160203 modify from 93 to 31 -->
+            <maxHistory>31</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy/MM/dd HH:mm:ss.SSS} [%-5level] [%thread] %file:%line - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ERROR_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${home}/log/batch_error.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${home}/log/batch_error.log.%d{yyyyMMdd}</fileNamePattern>
+            <!-- keep 93 days' worth of history -->
+            <maxHistory>93</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy/MM/dd HH:mm:ss.SSS} [%-5level] [%thread] %file:%line - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="WARN_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${home}/log/batch_warn.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${home}/log/batch_warn.log.%d{yyyyMMdd}</fileNamePattern>
+            <!-- keep 93 days' worth of history -->
+            <maxHistory>93</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy/MM/dd HH:mm:ss.SSS} [%-5level] [%thread] %file:%line - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <root level="debug">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="ROLLING_FILE"/>
+        <appender-ref ref="ERROR_LOG"/>
+        <appender-ref ref="WARN_LOG"/>
+    </root>
+
+    <logger name="org.apache" level="INFO"/>
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.hibernate" level="INFO"/>
+
+</configuration>

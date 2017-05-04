@@ -1,0 +1,6 @@
+spring:
+  profiles:
+    active: dev
+
+# 一時ファイルの出力ワークディレクトリ
+outputWorkDir: /tmp/labelmaker/work

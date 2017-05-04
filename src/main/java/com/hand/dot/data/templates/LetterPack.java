@@ -1,8 +1,6 @@
 package com.hand.dot.data.templates;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
-public class LetterPack {
+public class LetterPack extends PdfTemplate{
 
 	//[届け先]郵便番号
 	private String toPost;
@@ -76,10 +74,6 @@ public class LetterPack {
 	}
 	public void setItemName(String itemName) {
 		this.itemName = itemName;
-	}
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
 	}
 
 }
