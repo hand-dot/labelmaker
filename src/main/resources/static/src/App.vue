@@ -118,29 +118,46 @@
       },
       createPDF: function() {
         this.smallModalText = '';
-        console.log(JSON.stringify(this.pdfDatas));
         $('#confirmation').modal('hide');
         if(!_.isEmpty(this.pdfDatas)){
-          $.ajax({
-              type: 'POST', 
-              url:'/api/v1/letterpack',
-              dataType: 'json', 
-              contentType: 'application/json',
-              data:JSON.stringify(this.pdfDatas),
-              success: function(response) {
-                this.smallModalText = 'PDFを作成が完了しました。'
-              },
-              error: function() {
-                this.smallModalText = 'PDFを作成に失敗しました。'
-              },
-              beforeSend: function(){
-                this.smallModalText = 'PDFを作成中です。<br>そのままお待ちください。'
-                $('#small-modal').modal('show');
-              },
-              complete: function() {
-                //$('#small-modal').modal('hide');
-              }
-          });
+          // $.ajax({
+          //     type: 'POST', 
+          //     url:'/api/v1/letterpack',
+          //     dataType: 'application/pdf', 
+          //     contentType: 'application/json',
+          //     data:JSON.stringify(this.pdfDatas),
+          //     success: function(response) {
+          //       console.log(response);
+          //       this.smallModalText = 'PDFを作成が完了しました。'
+          //     },
+          //     error: function(e) {
+          //       console.log(e)
+          //       alert("エラー");
+          //       this.smallModalText = 'PDFを作成に失敗しました。'
+          //     },
+          //     beforeSend: function(){
+          //       this.smallModalText = 'PDFを作成中です。<br>そのままお待ちください。'
+          //       $('#small-modal').modal('show');
+          //     },
+          //     complete: function() {
+          //       //$('#small-modal').modal('hide');
+          //     }
+          // });
+
+
+          var datajson=JSON.stringify(this.pdfDatas);
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', '/api/v1/letterpack');
+          xhr.setRequestHeader("Content-Type", "application/json");
+          xhr.responseType = 'arraybuffer';
+          xhr.onload = function() {
+            var blob = new Blob([this.response]);
+            var pdfURL = window.URL.createObjectURL(blob);
+            window.open(pdfURL, '_blank');
+            console.log(this.response.byteLength);
+          };
+          xhr.send(datajson);
+
         }else{
           this.smallModalText = '作成するPDFが0ページです。<br>未入力の項目はございませんか？'
           $('#small-modal').modal('show');

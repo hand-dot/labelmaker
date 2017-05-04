@@ -91,7 +91,7 @@ public class PdfService {
 		return file;
 	}
 
-	public File fillInFieldByTemplateList(List<PdfTemplate> templateList,File dir) {
+	public File fillInFieldByTemplateList(List<? extends PdfTemplate> templateList,File dir) {
 		File tmpDir = FileUtil.createRandomFilePath(dir);
 		tmpDir.mkdir();
 		File file = FileUtil.createRandomFilePath(dir, pdfExtension);

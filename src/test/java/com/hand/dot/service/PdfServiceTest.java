@@ -45,7 +45,7 @@ public class PdfServiceTest {
 	}
 
 	@Test
-	//@Ignore
+	@Ignore
 	public void fillInFieldByTemplateList() {
 		File dir = new File(config.getOutputWorkDir());
 		List<PdfTemplate> templateList = new ArrayList<>();

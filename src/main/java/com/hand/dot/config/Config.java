@@ -7,6 +7,15 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties
 public class Config {
     private String outputWorkDir;
+    private int maxPageNum;
+
+	public int getMaxPageNum() {
+		return maxPageNum;
+	}
+
+	public void setMaxPageNum(int maxPageNum) {
+		this.maxPageNum = maxPageNum;
+	}
 
 	public String getOutputWorkDir() {
 		return outputWorkDir;
