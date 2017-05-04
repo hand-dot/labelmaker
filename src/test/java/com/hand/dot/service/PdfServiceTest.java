@@ -20,7 +20,7 @@ public class PdfServiceTest {
     private PdfService pdfService;
 
 	@Test
-	public void test() {
+	public void fillInField() {
 		LetterPack letterPack = new LetterPack();
 		letterPack.setToPost("1234567");
 		letterPack.setToAddres("東京都東京1-2-3-4 東京マンション123号");
@@ -33,7 +33,6 @@ public class PdfServiceTest {
 		letterPack.setItemName("テストアイテム");
 		File file = pdfService.fillInField(letterPack);
 		System.out.println(file.getAbsolutePath());
-
 	}
 
 }

@@ -1,5 +1,7 @@
 package com.hand.dot.data.templates;
 
+import com.hand.dot.util.StringUtil;
+
 public class LetterPack extends PdfTemplate{
 
 	//[届け先]郵便番号
@@ -25,7 +27,7 @@ public class LetterPack extends PdfTemplate{
 		return toPost;
 	}
 	public void setToPost(String toPost) {
-		this.toPost = toPost;
+		this.toPost = StringUtil.appendWithSeparators(toPost);
 	}
 	public String getToAddres() {
 		return toAddres;
@@ -49,7 +51,7 @@ public class LetterPack extends PdfTemplate{
 		return fromPost;
 	}
 	public void setFromPost(String fromPost) {
-		this.fromPost = fromPost;
+		this.fromPost = StringUtil.appendWithSeparators(fromPost);
 	}
 	public String getFromAddres() {
 		return fromAddres;
