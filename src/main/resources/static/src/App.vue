@@ -117,52 +117,41 @@
           }
       },
       createPDF: function() {
-        this.smallModalText = '';
+        let self = this;
+        self.smallModalText = '';
         $('#confirmation').modal('hide');
-        if(!_.isEmpty(this.pdfDatas)){
-          // $.ajax({
-          //     type: 'POST', 
-          //     url:'/api/v1/letterpack',
-          //     dataType: 'application/pdf', 
-          //     contentType: 'application/json',
-          //     data:JSON.stringify(this.pdfDatas),
-          //     success: function(response) {
-          //       console.log(response);
-          //       this.smallModalText = 'PDFを作成が完了しました。'
-          //     },
-          //     error: function(e) {
-          //       console.log(e)
-          //       alert("エラー");
-          //       this.smallModalText = 'PDFを作成に失敗しました。'
-          //     },
-          //     beforeSend: function(){
-          //       this.smallModalText = 'PDFを作成中です。<br>そのままお待ちください。'
-          //       $('#small-modal').modal('show');
-          //     },
-          //     complete: function() {
-          //       //$('#small-modal').modal('hide');
-          //     }
-          // });
-
-
-          var datajson=JSON.stringify(this.pdfDatas);
-          var xhr = new XMLHttpRequest();
+        if(!_.isEmpty(self.pdfDatas)){
+          let childWindow = window.open('about:blank');
+          let datajson=JSON.stringify(self.pdfDatas);
+          let xhr = new XMLHttpRequest();
           xhr.open('POST', '/api/v1/letterpack');
-          xhr.setRequestHeader("Content-Type", "application/json");
+          xhr.setRequestHeader('Content-Type', 'application/json');
           xhr.responseType = 'arraybuffer';
           xhr.onload = function() {
-            var blob = new Blob([this.response]);
-            var pdfURL = window.URL.createObjectURL(blob);
-            window.open(pdfURL, '_blank');
-            console.log(this.response.byteLength);
+			      let arrayBuffer = this.response;
+            let blob = new Blob([arrayBuffer], {type: 'application/pdf'});
+            let blob_url = window.URL.createObjectURL(blob);
+            childWindow.location.href = blob_url;
+            childWindow = null;
+          self.smallModalText = 'PDFを作成しました。'
+          $('#small-modal').modal('show');
+          };
+          xhr.onerror = function() {
+            childWindow.close();
+            childWindow = null;
+          self.smallModalText = 'PDFの作成時にエラーが発生しました。<br>お手数ですが、しばらくたってからもう一度お試しください。'
+          $('#small-modal').modal('show');
           };
           xhr.send(datajson);
-
         }else{
-          this.smallModalText = '作成するPDFが0ページです。<br>未入力の項目はございませんか？'
+          self.smallModalText = '作成するPDFが0ページです。<br>未入力の項目はございませんか？'
           $('#small-modal').modal('show');
         }
-
+      },
+      getUniqueStr:function(myStrong){
+        let strong = 1000;
+        if (myStrong) strong = myStrong;
+        return new Date().getTime().toString(16)  + Math.floor(strong*Math.random()).toString(16);
       }
     },
     created: function() {},
