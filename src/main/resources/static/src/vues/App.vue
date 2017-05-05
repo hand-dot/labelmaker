@@ -57,14 +57,14 @@
                 </div>
               </div>
             </div>
-            <div id="alert" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+            <div id="alert" class="modal fade" tabindex="-1" role="dialog">
               <div class="modal-dialog" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h5 class="modal-title" id="confirmationLabel">メッセージ</h5>
                   </div>
-                  <div class="modal-body" v-html="smallModalText">{{smallModalText}}</div>
+                  <div class="modal-body" v-html="alertModalText">{{alertModalText}}</div>
                 </div>
               </div>
             </div>
@@ -84,11 +84,12 @@
   require('bootstrap');
   import _ from 'lodash';
   import 'bootstrap/dist/css/bootstrap.css';
+  import UAParser from 'ua-parser-js';
   import Handsontable from 'handsontable/dist/handsontable.full.js';
   import 'handsontable/dist/handsontable.full.min.css';
-  import letterpack from './table_settings/letter-pack';
   import {introJs}  from 'intro.js';
   import 'intro.js/introjs.css';
+  import letterpack from '../table_settings/letter-pack';
   import UserTerm from './UserTerm.vue';
   let hot;
   let tour = introJs();
@@ -109,7 +110,7 @@
           colHeaders: letterpack.colHeaders
         },
         pdfDatas: [],
-        smallModalText: '',
+        alertModalText: '',
       }
     },
     methods: {
@@ -157,7 +158,7 @@
                     hot.setDataAtRowProp(row, addresProp, addressArr[3].long_name+addressArr[2].long_name+addressArr[1].long_name);
                   }
                 }else{//住所の結果なし
-                  self.smallModalText = '該当する郵便番号がありませんでした。'
+                  self.alertModalText = '該当する郵便番号がありませんでした。'
                   $('#alert').modal('show');
                 }
               });
@@ -222,7 +223,7 @@
       },
       createPDF: function() {
         let self = this;
-        self.smallModalText = '';
+        self.alertModalText = '';
         $('#js-pdf-create-confirmation').modal('hide');
         if (!_.isEmpty(self.pdfDatas)) {
           let datajson = JSON.stringify(self.pdfDatas);
@@ -230,14 +231,10 @@
           xhr.open('POST', '/api/v1/letterpack');
           xhr.setRequestHeader('Content-Type', 'application/json');
           xhr.responseType = 'arraybuffer';
-          // xhr.onloadstart = function() {
-          //  self.smallModalText ='';
-          //  $('#alert').modal('show');
-          // }
           xhr.onprogress = function(ev) {
              $('#alert').modal('show');
             let percent =  Math.floor(parseInt(ev.loaded/ev.total*10000)/100);
-            self.smallModalText ='PDFを作成しています。そのまましばらくお待ちください。<br><br><div class="progress"><div class="progress-bar" role="progressbar" style="width: '+percent+'%;">'+percent+'%</div></div>';
+            self.alertModalText ='PDFを作成しています。そのまましばらくお待ちください。<br><br><div class="progress"><div class="progress-bar" role="progressbar" style="width: '+percent+'%;">'+percent+'%</div></div>';
             
           }
           xhr.onloadend = function() {
@@ -245,15 +242,15 @@
             if(this.status === 200){
               let arrayBuffer = this.response;
               let blob_url = window.URL.createObjectURL(new Blob([arrayBuffer], {type: 'application/pdf'}));
-              self.smallModalText = 'PDFを作成しました。<a href="'+blob_url+'" target="_blank">ファイルを開く</a><br><br><div class="progress"><div class="progress-bar" role="progressbar" style="width: 100%;">100%</div></div>'
+              self.alertModalText = 'PDFを作成しました。<a href="'+blob_url+'" target="_blank">ファイルを開く</a><br><br><div class="progress"><div class="progress-bar" role="progressbar" style="width: 100%;">100%</div></div>'
             }else{
-              self.smallModalText = 'エラーステータス：'+this.status+'<br><br>PDFの作成時にエラーが発生しました。<br>お手数ですが、しばらくたってからもう一度お試しください。'
+              self.alertModalText = 'エラーステータス：'+this.status+'<br><br>PDFの作成時にエラーが発生しました。<br>お手数ですが、しばらくたってからもう一度お試しください。'
             }
             
           };
           xhr.send(datajson);
         } else {
-          self.smallModalText = 'PDFは作成できませんでした。<br>作成するPDFが0ページです。未入力の項目はございませんか？<br><small>(未入力の項目がある行は無視されます。)</small>'
+          self.alertModalText = 'PDFは作成できませんでした。<br>作成するPDFが0ページです。未入力の項目はございませんか？<br><small>(未入力の項目がある行は無視されます。)</small>'
           $('#alert').modal('show');
         }
       }
@@ -262,6 +259,12 @@
     mounted: function() {
       this.initTable();
       this.updateTableSettings();
+      let parser = new UAParser();
+      parser.setUA(window.navigator.userAgent);
+      let result = parser.getResult();
+      if(result.device.type === 'mobile' || result.device.type === 'tablet'){
+        alert('本サービスはスマートフォン、タブレットでの動作を想定していません。快適に操作するためにはPCからアクセスしてください。'); 
+      }
     },
     beforeUpdate: function() {},
     updated: function() {},
