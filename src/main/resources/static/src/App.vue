@@ -2,19 +2,19 @@
   <div id="app" class="container">
     <div id="menu" class="row">
       <div class="form-group">
-        <label class="col-xs-7 control-label">
-          レターパックなどの記入を効率的に行うためのサービスです。<br>エクセルの操作感で一度に最大50件のラベルを作成できます。
-          <button @click="startTutorial"　type="button" class="btn btn-default">使い方を見る</button>
-        </label>
-        <div class="col-xs-5">
+        <div class="col-xs-6 control-label">
+          <strong style="line-height: 1.8">レターパックなどの記入を効率的に行うためのサービスです。<br>エクセルの操作感で一度に最大50件のラベルを作成できます。</strong style="line-height: 1.8">
+          <button @click="startTutorial" type="button" class="btn btn-default">使い方を見る</button>
+        </div>
+        <div class="col-xs-6 text-center">
           <div class="form-group">
-            <div class="col-xs-6">
+            <div class="text-center col-xs-4">
               <label>テンプレートを選択</label>
               <select data-intro="作成したいテンプレートを選択してください。<br><br>(現在レターパックのみ)" data-step="1" name="template" v-model="selected" 　@change="selectTemplate" class="form-control">
                 <option value="letterpack">レターパック</option>
               </select>
             </div>
-            <div class="col-xs-6">
+            <div class="text-center col-xs-4">
               <label>シートからPDFを作成</label>
               <button data-intro="このシートへの記入が終了したらこのボタンを押してPDFをダウンロードしてください。" data-step="3" type="button" @click="openCreatePDFModal" class="btn btn-default" data-toggle="modal" data-target="#js-pdf-create-confirmation">PDFを作成する</button>
               <div class="modal fade" id="js-pdf-create-confirmation" tabindex="-1" role="dialog" aria-labelledby="confirmationLabel">
@@ -31,6 +31,27 @@
                     <div class="modal-footer">
                       <button type="button" class="btn btn-default" data-dismiss="modal">いいえ</button>
                       <button @click="createPDF" type="button" class="btn btn-primary">はい</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="text-center col-xs-4">
+              <label>シートをリセット</label>
+              <button type="button" class="btn btn-default" data-toggle="modal" data-target="#js-clear-sheet">リセットする</button>
+              <div class="modal fade" id="js-clear-sheet" tabindex="-1" role="dialog" aria-labelledby="clearSheetLabel">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      <h4 class="modal-title" id="clearSheetLabel">シートをリセット</h4>
+                    </div>
+                    <div class="modal-body">
+                      現在シートに記入している内容をすべて破棄しますか？
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">いいえ</button>
+                      <button @click="clearSheet" type="button" class="btn btn-primary">はい</button>
                     </div>
                   </div>
                 </div>
@@ -97,6 +118,53 @@
           window.open('example.pdf?multipage=true','about:blank');
         });
       },
+      initTable:function(){
+        let self = this;
+        let table = document.getElementById('table');
+        hot = new Handsontable(table, {
+          minSpareRows: 50,
+          maxSpareRows: 50,
+          height: $(window).height() - $('#menu').height() - 60,
+          rowHeaders: true,
+          comments: true,
+          enterMoves: function(e) {
+            let obj = {
+              row: 0,
+              col: 1
+            }
+            let colLength = self.nowSetting.columns.length;
+            if (colLength === hot.getSelected()[1] + 1) {
+              obj.row = 1;
+              obj.col = (colLength - 1) * -1;
+            }
+            return obj;
+          },
+          afterValidate:function(isValid,value,row,prop,source){
+            if(isValid && _.includes(['toPost','fromPost'],prop)){
+              let query = "https://maps.googleapis.com/maps/api/geocode/json?address="+value+"&language=ja";
+              $.get(query,function(data){
+                let result = data.results[0];
+                if(result !== undefined){
+                  let addressArr = result.address_components;
+                  let addresProp = (function(){
+                    if(prop === 'toPost'){
+                      return 'toAddres';
+                    }else{
+                      return 'fromAddres';
+                    }
+                  }());
+                  if(_.isEmpty(hot.getDataAtRowProp(row, addresProp))){
+                    hot.setDataAtRowProp(row, addresProp, addressArr[3].long_name+addressArr[2].long_name+addressArr[1].long_name);
+                  }
+                }else{//住所の結果なし
+                  self.smallModalText = '該当する郵便番号がありませんでした。'
+                  $('#alert').modal('show');
+                }
+              });
+            }
+          }
+        });
+      },
       updateTableSettings: function() {
         if (!_.isNull(hot)) {
           let nowSetting = this.nowSetting;
@@ -119,6 +187,14 @@
             cell: cell,
           });
         }
+      },
+      clearSheet: function(){
+        if (!_.isNull(hot)) {
+          hot.destroy();
+          this.initTable();
+          this.updateTableSettings();
+        }
+        $('#js-clear-sheet').modal('hide');
       },
       selectTemplate: function() {
         //テンプレートの数だけここが増える
@@ -177,53 +253,7 @@
     },
     created: function() {},
     mounted: function() {
-      let self = this;
-      let table = document.getElementById('table');
-  
-      hot = new Handsontable(table, {
-        minSpareRows: 50,
-        maxSpareRows: 50,
-        height: $(window).height() - $('#menu').height() - 60,
-        rowHeaders: true,
-        comments: true,
-        enterMoves: function(e) {
-          let obj = {
-            row: 0,
-            col: 1
-          }
-          let colLength = self.nowSetting.columns.length;
-          if (colLength === hot.getSelected()[1] + 1) {
-            obj.row = 1;
-            obj.col = (colLength - 1) * -1;
-          }
-          return obj;
-        },
-        afterValidate:function(isValid,value,row,prop,source){
-          if(isValid && _.includes(['toPost','fromPost'],prop)){
-            let query = "https://maps.googleapis.com/maps/api/geocode/json?address="+value+"&language=ja";
-            $.get(query,function(data){
-              let result = data.results[0];
-              if(result !== undefined){
-                let addressArr = result.address_components;
-                let addresProp = (function(){
-                  if(prop === 'toPost'){
-                    return 'toAddres';
-                  }else{
-                    return 'fromAddres';
-                  }
-                }());
-                if(_.isEmpty(hot.getDataAtRowProp(row, addresProp))){
-                  hot.setDataAtRowProp(row, addresProp, addressArr[3].long_name+addressArr[2].long_name+addressArr[1].long_name);
-                }
-              }else{//住所の結果なし
-                self.smallModalText = '該当する郵便番号がありませんでした。'
-                $('#alert').modal('show');
-              }
-            });
-          }
-        }
-      });
-
+      this.initTable();
       this.updateTableSettings();
     },
     beforeUpdate: function() {},
