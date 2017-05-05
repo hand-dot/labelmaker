@@ -40,10 +40,8 @@ public class PdfController {
 			if (letterpackList != null && 0 < letterpackList.size() && letterpackList.size() <= maxPageNum) {
 				File file = pdfService.fillInFieldByTemplateList(letterpackList, new File(config.getOutputWorkDir()));
 				Resource resource = new UrlResource(file.toPath().toUri());
-				res = ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF)
-						.header(HttpHeaders.CONTENT_DISPOSITION,
-								"attachment; filename=\"" + resource.getFilename() + "\"")
-						.body(resource);
+				res = ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF).header(HttpHeaders.CONTENT_DISPOSITION,
+						"attachment; filename=\"" + resource.getFilename() + "\"").body(resource);
 			} else {
 				res = ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON)
 						.body("一度に作成できるPDFは最大" + config.getMaxPageNum() + "ページです");
@@ -52,7 +50,7 @@ public class PdfController {
 			log.error(String.format("APIの呼び出しからのPDF作成に失敗しました。", e));
 			throw e;
 		}
-		if(res == null){
+		if (res == null) {
 			res = ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON)
 					.body("サーバエラーが発生しました。申し訳ございませんが、しばらくたってからもう一度お試しください。");
 		}

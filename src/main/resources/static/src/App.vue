@@ -129,8 +129,7 @@
           xhr.responseType = 'arraybuffer';
           xhr.onload = function() {
 			      let arrayBuffer = this.response;
-            let blob = new Blob([arrayBuffer], {type: 'application/pdf'});
-            let blob_url = window.URL.createObjectURL(blob);
+            let blob_url = window.URL.createObjectURL(new Blob([arrayBuffer], {type: 'application/pdf'}));
             childWindow.location.href = blob_url;
             childWindow = null;
           self.smallModalText = 'PDFを作成しました。'
@@ -156,12 +155,25 @@
     },
     created: function() {},
     mounted: function() {
+      let self = this;
       let table = document.getElementById('table');
   
       hot = new Handsontable(table, {
         minSpareRows: 50,
         height: $(window).height() - $('#menu').height() - 40,
-        rowHeaders: true
+        rowHeaders: true,
+        enterMoves: function(e){
+           let obj = {
+            row: 0,
+            col: 1,
+          }
+          let colLength = self.nowSetting.columns.length;
+          if(colLength === hot.getSelected()[1] + 1){
+            obj.row = 1; 
+            obj.col = (colLength - 1) * -1; 
+          }
+          return obj;
+        }
       });
 
       this.updateTableSettings();           
