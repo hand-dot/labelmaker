@@ -225,24 +225,31 @@
         self.smallModalText = '';
         $('#js-pdf-create-confirmation').modal('hide');
         if (!_.isEmpty(self.pdfDatas)) {
-          let childWindow = window.open('about:blank');
           let datajson = JSON.stringify(self.pdfDatas);
           let xhr = new XMLHttpRequest();
           xhr.open('POST', '/api/v1/letterpack');
           xhr.setRequestHeader('Content-Type', 'application/json');
           xhr.responseType = 'arraybuffer';
+          // xhr.onloadstart = function() {
+          //  self.smallModalText ='';
+          //  $('#alert').modal('show');
+          // }
+          xhr.onprogress = function(ev) {
+             $('#alert').modal('show');
+            let percent =  Math.floor(parseInt(ev.loaded/ev.total*10000)/100);
+            self.smallModalText ='PDFを作成しています。そのまましばらくお待ちください。<br><br><div class="progress"><div class="progress-bar" role="progressbar" style="width: '+percent+'%;">'+percent+'%</div></div>';
+            
+          }
           xhr.onloadend = function() {
+             $('#alert').modal('show');
             if(this.status === 200){
               let arrayBuffer = this.response;
               let blob_url = window.URL.createObjectURL(new Blob([arrayBuffer], {type: 'application/pdf'}));
-              childWindow.location.href = blob_url;
-              self.smallModalText = 'PDFを作成しました。'
+              self.smallModalText = 'PDFを作成しました。<a href="'+blob_url+'" target="_blank">ファイルを開く</a><br><br><div class="progress"><div class="progress-bar" role="progressbar" style="width: 100%;">100%</div></div>'
             }else{
-              childWindow.close();
               self.smallModalText = 'エラーステータス：'+this.status+'<br><br>PDFの作成時にエラーが発生しました。<br>お手数ですが、しばらくたってからもう一度お試しください。'
             }
-            $('#alert').modal('show');
-            childWindow = null;
+            
           };
           xhr.send(datajson);
         } else {
