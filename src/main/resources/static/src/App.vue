@@ -2,11 +2,11 @@
   <div id="app" class="container">
     <div id="menu" class="row">
       <div class="form-group">
-        <label class="col-xs-6 control-label">
-          レターパックなどの記入を効率的に行うことができるサービスです。<br>エクセルの操作感で一度に最大50件のラベルを作成できます。
+        <label class="col-xs-7 control-label">
+          レターパックなどの記入を効率的に行うためのサービスです。<br>エクセルの操作感で一度に最大50件のラベルを作成できます。
           <button @click="startTutorial"　type="button" class="btn btn-default">使い方を見る</button>
         </label>
-        <div class="col-xs-6">
+        <div class="col-xs-5">
           <div class="form-group">
             <div class="col-xs-6">
               <label>テンプレートを選択</label>
@@ -16,8 +16,8 @@
             </div>
             <div class="col-xs-6">
               <label>シートからPDFを作成</label>
-              <button data-intro="このシートへの記入が終了したらこのボタンを押してPDFをダウンロードしてください。" data-step="3" type="button" @click="openCreatePDFModal" class="btn btn-default" data-toggle="modal" data-target="#confirmation">PDF作成</button>
-              <div class="modal fade" id="confirmation" tabindex="-1" role="dialog" aria-labelledby="confirmationLabel">
+              <button data-intro="このシートへの記入が終了したらこのボタンを押してPDFをダウンロードしてください。" data-step="3" type="button" @click="openCreatePDFModal" class="btn btn-default" data-toggle="modal" data-target="#js-pdf-create-confirmation">PDFを作成する</button>
+              <div class="modal fade" id="js-pdf-create-confirmation" tabindex="-1" role="dialog" aria-labelledby="confirmationLabel">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content">
                     <div class="modal-header">
@@ -36,8 +36,8 @@
                 </div>
               </div>
             </div>
-            <div id="small-modal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
-              <div class="modal-dialog modal-sm" role="document">
+            <div id="alert" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+              <div class="modal-dialog" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -53,6 +53,7 @@
     </div>
     <div data-intro="このシートの各項目を記入してください。<br><br>コピペやドラッグなど、エクセルと同等の操作が可能です。<br><br>エクセルからもしくはエクセルへのコピペにも対応しています。" data-step="2" id="table">
     </div>
+    <UserTerm></UserTerm>
   </div>
 </template>
 
@@ -60,19 +61,20 @@
   global.jQuery = require('jquery');
   const $ = global.jQuery;
   require('bootstrap');
-  import _ from 'lodash'
-  import 'bootstrap/dist/css/bootstrap.css'
-  import Handsontable from 'handsontable/dist/handsontable.full.js'
-  import 'handsontable/dist/handsontable.full.min.css'
-  import letterpack from './table_settings/letter-pack'
+  import _ from 'lodash';
+  import 'bootstrap/dist/css/bootstrap.css';
+  import Handsontable from 'handsontable/dist/handsontable.full.js';
+  import 'handsontable/dist/handsontable.full.min.css';
+  import letterpack from './table_settings/letter-pack';
   import {introJs}  from 'intro.js';
   import 'intro.js/introjs.css';
+  import UserTerm from './UserTerm.vue';
   let hot;
   let tour = introJs();
-  tour.setOption('nextLabel', '次へ')
-  tour.setOption('prevLabel', '戻る')
-  tour.setOption('skipLabel', 'スキップ')
-  tour.setOption('doneLabel', 'PDFファイルのサンプルを見る')
+  tour.setOption('nextLabel', '次へ');
+  tour.setOption('prevLabel', '戻る');
+  tour.setOption('skipLabel', 'スキップ');
+  tour.setOption('doneLabel', 'PDFファイルのサンプルを見る');
   tour.setOption('tooltipPosition', 'auto');
   tour.setOption('positionPrecedence', ['left', 'right', 'bottom', 'top']);
   
@@ -86,7 +88,7 @@
           colHeaders: letterpack.colHeaders
         },
         pdfDatas: [],
-        smallModalText: ''
+        smallModalText: '',
       }
     },
     methods: {
@@ -94,7 +96,7 @@
         tour.start().oncomplete(function() {
           window.open('example.pdf?multipage=true','about:blank');
         });
-    },
+      },
       updateTableSettings: function() {
         if (!_.isNull(hot)) {
           let nowSetting = this.nowSetting;
@@ -145,7 +147,7 @@
       createPDF: function() {
         let self = this;
         self.smallModalText = '';
-        $('#confirmation').modal('hide');
+        $('#js-pdf-create-confirmation').modal('hide');
         if (!_.isEmpty(self.pdfDatas)) {
           let childWindow = window.open('about:blank');
           let datajson = JSON.stringify(self.pdfDatas);
@@ -153,26 +155,23 @@
           xhr.open('POST', '/api/v1/letterpack');
           xhr.setRequestHeader('Content-Type', 'application/json');
           xhr.responseType = 'arraybuffer';
-          xhr.onload = function() {
-            let arrayBuffer = this.response;
-            let blob_url = window.URL.createObjectURL(new Blob([arrayBuffer], {
-            type: 'application/pdf'
-            }));
-            childWindow.location.href = blob_url;
+          xhr.onloadend = function() {
+            if(this.status === 200){
+              let arrayBuffer = this.response;
+              let blob_url = window.URL.createObjectURL(new Blob([arrayBuffer], {type: 'application/pdf'}));
+              childWindow.location.href = blob_url;
+              self.smallModalText = 'PDFを作成しました。'
+            }else{
+              childWindow.close();
+              self.smallModalText = 'エラーステータス：'+this.status+'<br><br>PDFの作成時にエラーが発生しました。<br>お手数ですが、しばらくたってからもう一度お試しください。'
+            }
+            $('#alert').modal('show');
             childWindow = null;
-            self.smallModalText = 'PDFを作成しました。'
-            $('#small-modal').modal('show');
-          };
-          xhr.onerror = function() {
-            childWindow.close();
-            childWindow = null;
-            self.smallModalText = 'PDFの作成時にエラーが発生しました。<br>お手数ですが、しばらくたってからもう一度お試しください。'
-            $('#small-modal').modal('show');
           };
           xhr.send(datajson);
         } else {
-          self.smallModalText = '作成するPDFが0ページです。<br>未入力の項目はございませんか？'
-          $('#small-modal').modal('show');
+          self.smallModalText = 'PDFは作成できませんでした。<br>作成するPDFが0ページです。未入力の項目はございませんか？<br><small>(未入力の項目がある行は無視されます。)</small>'
+          $('#alert').modal('show');
         }
       }
     },
@@ -184,7 +183,7 @@
       hot = new Handsontable(table, {
         minSpareRows: 50,
         maxSpareRows: 50,
-        height: $(window).height() - $('#menu').height() - 40,
+        height: $(window).height() - $('#menu').height() - 60,
         rowHeaders: true,
         comments: true,
         enterMoves: function(e) {
@@ -218,7 +217,7 @@
                 }
               }else{//住所の結果なし
                 self.smallModalText = '該当する郵便番号がありませんでした。'
-                $('#small-modal').modal('show');
+                $('#alert').modal('show');
               }
             });
           }
@@ -228,15 +227,21 @@
       this.updateTableSettings();
     },
     beforeUpdate: function() {},
-    updated: function() {}
+    updated: function() {},
+    components:{
+      UserTerm
+    }
   }
 </script>
 
 <style lang="scss">
   #app {
+    .black{
+      color:#000;
+    }
     #menu {
       margin-top: 20px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       label {
         display: block;
       }
