@@ -30,14 +30,12 @@ public class PdfController {
 	@Autowired
 	private Config config;
 
-	private final int maxPageNum = 50;
-
 	@RequestMapping(value = "/api/v1/letterpack", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> post(@RequestBody List<LetterPack> letterpackList) throws IOException {
 		ResponseEntity<?> res;
 
 		try {
-			if (letterpackList != null && 0 < letterpackList.size() && letterpackList.size() <= maxPageNum) {
+			if (letterpackList != null && 0 < letterpackList.size() && letterpackList.size() <= config.getMaxPageNum()) {
 				File file = pdfService.fillInFieldByTemplateList(letterpackList, new File(config.getOutputWorkDir()));
 				Resource resource = new UrlResource(file.toPath().toUri());
 				res = ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF).header(HttpHeaders.CONTENT_DISPOSITION,
