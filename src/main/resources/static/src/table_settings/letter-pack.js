@@ -5,35 +5,40 @@ export default {
     },
     columns: [{
             data: 'toPost',
-            value: '[届け先]郵便番号',
+            value: '[To]郵便番号',
+            validator: /^\d{7}$/,
+            comment: '半角数字7桁で入力してください\n\n[To]おところの欄が空欄の場合、\n郵便番号から自動入力します。',
         },
         {
             data: 'toAddres',
-            value: '[届け先]おところ',
+            value: '[To]おところ',
         },
         {
             data: 'toName',
-            value: '[届け先]おなまえ',
+            value: '[To]おなまえ',
         },
         {
             data: 'toTel',
-            value: '[届け先]電話番号',
+            value: '[To]電話番号',
+            comment: '届け先の電話番号が不明の場合は\n半角数字で　0　を入力してください\n仕上がったPDFでは空欄になります。',
         },
         {
             data: 'fromPost',
-            value: '[依頼主]郵便番号',
+            value: '[From]郵便番号',
+            validator: /^\d{7}$/,
+            comment: '半角数字7桁で入力してください\n\n[From]おところの欄が空欄の場合、\n郵便番号から自動入力します。',
         },
         {
             data: 'fromAddres',
-            value: '[依頼主]おところ',
+            value: '[From]おところ',
         },
         {
             data: 'fromName',
-            value: '[依頼主]おなまえ',
+            value: '[From]おなまえ',
         },
         {
             data: 'fromTel',
-            value: '[依頼主]電話番号',
+            value: '[From]電話番号',
         },
         {
             data: 'itemName',

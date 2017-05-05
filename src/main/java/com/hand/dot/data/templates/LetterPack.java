@@ -45,6 +45,10 @@ public class LetterPack extends PdfTemplate{
 		return toTel;
 	}
 	public void setToTel(String toTel) {
+		if(toTel != null && toTel.equals("0")){
+			this.toTel = "";
+			return;
+		}
 		this.toTel = toTel;
 	}
 	public String getFromPost() {
