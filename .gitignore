@@ -28,3 +28,6 @@ nbdist/
 
 ### npm ###
 npm-debug.log
+
+### app config ###
+src/main/resources/config/

@@ -1,7 +1,0 @@
-spring:
-  profiles:
-    active: dev
-
-# 一時ファイルの出力ワークディレクトリ
-outputWorkDir: /c:/tmp/labelmaker/work
-maxPageNum: 50
