@@ -6,7 +6,7 @@
     </contextListener>
     <!-- ここまで -->
 
-    <property name="home" value="/opt/report-server"/>
+    <property name="home" value="/opt/labelmaker"/>
     <timestamp key="timestamp" datePattern="yyyyMMdd'T'HHmmss"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -34,13 +34,13 @@
 
     <appender name="ROLLING_FILE"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${home}/log/report-server.log</file>
+        <file>${home}/log/labelmaker.log</file>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>TRACE</level>
         </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- daily rollover -->
-            <fileNamePattern>${home}/log/report-server.log.%d{yyyyMMdd}
+            <fileNamePattern>${home}/log/labelmaker.log.%d{yyyyMMdd}
             </fileNamePattern>
             <!-- keep 93 days' worth of history 20160203 modify from 93 to 31 -->
             <maxHistory>31</maxHistory>

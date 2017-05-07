@@ -116,7 +116,7 @@
     methods: {
       startTutorial:function(){
         tour.start().oncomplete(function() {
-          window.open('example.pdf?multipage=true','about:blank');
+          window.open('./example.pdf?multipage=true','about:blank');
         });
       },
       initTable:function(){
@@ -228,7 +228,7 @@
         if (!_.isEmpty(self.pdfDatas)) {
           let datajson = JSON.stringify(self.pdfDatas);
           let xhr = new XMLHttpRequest();
-          xhr.open('POST', '/api/v1/letterpack');
+          xhr.open('POST', './api/v1/letterpack');
           xhr.setRequestHeader('Content-Type', 'application/json');
           xhr.responseType = 'arraybuffer';
           xhr.onprogress = function(ev) {

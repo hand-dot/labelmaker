@@ -46,11 +46,7 @@ public class PdfController {
 			}
 		} catch (Throwable e) {
 			log.error(String.format("APIの呼び出しからのPDF作成に失敗しました。", e));
-			throw e;
-		}
-		if (res == null) {
-			res = ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON)
-					.body("サーバエラーが発生しました。申し訳ございませんが、しばらくたってからもう一度お試しください。");
+			res = ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body("サーバエラーが発生しました。申し訳ございませんが、しばらくたってからもう一度お試しください。");
 		}
 		return res;
 	}
