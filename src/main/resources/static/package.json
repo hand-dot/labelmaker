@@ -17,6 +17,7 @@
     "lovefield": "^2.1.12",
     "style-loader": "^0.16.1",
     "ua-parser-js": "^0.7.12",
+    "uuid": "^3.0.1",
     "vue": "^2.2.1"
   },
   "devDependencies": {

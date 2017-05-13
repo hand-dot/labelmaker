@@ -16,57 +16,11 @@
             </div>
             <div class="text-center col-xs-4">
               <label>シートからPDFを作成</label>
-              <button data-intro="このシートへの記入が終了したらこのボタンを押してPDFをダウンロードしてください。" data-step="3" type="button" @click="openCreatePDFModal" class="btn btn-default" data-toggle="modal" data-target="#js-pdf-create-confirmation">PDFを作成する</button>
-              <div class="modal fade" id="js-pdf-create-confirmation" tabindex="-1" role="dialog" aria-labelledby="confirmationLabel">
-                <div class="modal-dialog" role="document">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                      <h4 class="modal-title" id="confirmationLabel">シートからPDFを作成</h4>
-                    </div>
-                    <div class="modal-body">
-                      現在シートに記入している内容で<strong>{{pdfDatas.length}}ページ</strong>のPDFを作成します。<br>
-                      <small>(未入力の項目がある行は無視されます。)</small><br><br> PDFを作成してよろしいですか？
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-default" data-dismiss="modal">いいえ</button>
-                      <button @click="createPDF" type="button" class="btn btn-primary">はい</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <button data-intro="このシートへの記入が終了したらこのボタンを押してPDFをダウンロードしてください。" data-step="3" type="button" @click="openCreatePDFConfirm" class="btn btn-default" data-toggle="modal" data-target="#js-pdf-create-confirmation">PDFを作成する</button>
             </div>
             <div class="text-center col-xs-4">
               <label>シートをリセット</label>
-              <button type="button" class="btn btn-default" data-toggle="modal" data-target="#js-clear-sheet">リセットする</button>
-              <div class="modal fade" id="js-clear-sheet" tabindex="-1" role="dialog" aria-labelledby="clearSheetLabel">
-                <div class="modal-dialog" role="document">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                      <h4 class="modal-title" id="clearSheetLabel">シートをリセット</h4>
-                    </div>
-                    <div class="modal-body">
-                      現在シートに記入している内容をすべて破棄しますか？
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-default" data-dismiss="modal">いいえ</button>
-                      <button @click="clearSheet" type="button" class="btn btn-primary">はい</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div id="alert" class="modal fade" tabindex="-1" role="dialog">
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h5 class="modal-title" id="confirmationLabel">メッセージ</h5>
-                  </div>
-                  <div class="modal-body" v-html="alertModalText">{{alertModalText}}</div>
-                </div>
-              </div>
+              <button type="button" class="btn btn-default" @click="openClearTableConfirm">リセットする</button>
             </div>
           </div>
         </div>
@@ -75,6 +29,10 @@
     <div data-intro="このシートの各項目を記入してください。<br><br>コピペやドラッグなど、エクセルと同等の操作が可能です。<br><br>エクセルからもしくはエクセルへのコピペにも対応しています。" data-step="2" id="table">
     </div>
     <UserTerm></UserTerm>
+    <Modal :options="createPDFAlert"></Modal>
+    <Modal :options="tablesAlert"></Modal>
+    <Modal :options="createPDFConfirm" v-on:ok="createPDF"></Modal>
+    <Modal :options="clearTableConfirm" v-on:ok="clearTable"></Modal>
   </div>
 </template>
 
@@ -87,12 +45,15 @@
   import UAParser from 'ua-parser-js';
   import Handsontable from 'handsontable/dist/handsontable.full.js';
   import 'handsontable/dist/handsontable.full.min.css';
-  import {introJs}  from 'intro.js';
+  import {
+    introJs
+  } from 'intro.js';
   import 'intro.js/introjs.css';
   import letterpack from '../table_settings/letter-pack';
   import UserTerm from './UserTerm.vue';
+  import Modal from './Modal.vue';
   import formatter from '../utils/address-formatter'
-
+  
   let hot;
   let tour = introJs();
   tour.setOption('nextLabel', '次へ');
@@ -112,16 +73,39 @@
           colHeaders: letterpack.colHeaders
         },
         pdfDatas: [],
-        alertModalText: '',
+        tablesAlert: {
+          title: '',
+          text: '',
+          visible: false,
+          confirm: false,
+        },
+        clearTableConfirm: {
+          title: 'シートをリセット',
+          text: '現在シートに記入している内容をすべて破棄しますか？',
+          visible: false,
+          confirm: true,
+        },
+        createPDFAlert: {
+          title: '',
+          text: '',
+          visible: false,
+          confirm: false,
+        },
+        createPDFConfirm: {
+          title: 'シートからPDFを作成',
+          text: '',
+          visible: false,
+          confirm: true,
+        },
       }
     },
     methods: {
-      startTutorial:function(){
+      startTutorial: function() {
         tour.start().oncomplete(function() {
-          window.open('./assets/pdf/example.pdf?multipage=true','about:blank');
+          window.open('./assets/pdf/example.pdf?multipage=true', 'about:blank');
         });
       },
-      initTable:function(){
+      initTable: function() {
         let self = this;
         let table = document.getElementById('table');
         hot = new Handsontable(table, {
@@ -142,25 +126,26 @@
             }
             return obj;
           },
-          afterValidate:function(isValid,value,row,prop,source){
-            if(isValid && _.includes(['toPost','fromPost'],prop)){
-              let query = "https://maps.googleapis.com/maps/api/geocode/json?address="+value.replace( /-/g , '' )+"&language=ja";
-              $.get(query,function(data){
+          afterValidate: function(isValid, value, row, prop, source) {
+            if (isValid && _.includes(['toPost', 'fromPost'], prop)) {
+              let query = "https://maps.googleapis.com/maps/api/geocode/json?address=" + value.replace(/-/g, '') + "&language=ja";
+              $.get(query, function(data) {
                 let result = data.results[0];
-                if(result !== undefined){
-                  let addresProp = (function(){
-                    if(prop === 'toPost'){
+                if (result !== undefined) {
+                  let addresProp = (function() {
+                    if (prop === 'toPost') {
                       return 'toAddres';
-                    }else if(prop === 'fromPost'){
+                    } else if (prop === 'fromPost') {
                       return 'fromAddres';
                     }
                   }());
-                  if(_.isEmpty(hot.getDataAtRowProp(row, addresProp))){
+                  if (_.isEmpty(hot.getDataAtRowProp(row, addresProp))) {
                     hot.setDataAtRowProp(row, addresProp, formatter.formatGoogleApisAddress(result));
                   }
-                }else{//住所の結果なし
-                  self.alertModalText = '該当する郵便番号がありませんでした。'
-                  $('#alert').modal('show');
+                } else { //住所の結果なし
+                  self.tablesAlert.text = '該当する郵便番号がありませんでした。'
+                  self.tablesAlert.title = '警告'
+                  self.tablesAlert.visible = true
                 }
               });
             }
@@ -170,14 +155,16 @@
       updateTableSettings: function() {
         if (!_.isNull(hot)) {
           let nowSetting = this.nowSetting;
-          let cell = (function(){
+          let cell = (function() {
             let arr = [];
-            nowSetting.columns.forEach(function(column,index){
-              if(column.comment !== undefined){
+            nowSetting.columns.forEach(function(column, index) {
+              if (column.comment !== undefined) {
                 let obj = {};
                 obj.row = 0;
                 obj.col = index;
-                obj.comment = {value: column.comment}
+                obj.comment = {
+                  value: column.comment
+                }
                 arr.push(obj)
               }
             });
@@ -190,13 +177,13 @@
           });
         }
       },
-      clearSheet: function(){
+      clearTable: function() {
         if (!_.isNull(hot)) {
           hot.destroy();
           this.initTable();
           this.updateTableSettings();
         }
-        $('#js-clear-sheet').modal('hide');
+        this.clearTableConfirm.visible = false;
       },
       selectTemplate: function() {
         //テンプレートの数だけここが増える
@@ -206,8 +193,13 @@
         }
         this.updateTableSettings();
       },
-      openCreatePDFModal: function() {
+      openClearTableConfirm: function() {
+        this.clearTableConfirm.visible = true;
+      },
+      openCreatePDFConfirm: function() {
         let self = this;
+        self.createPDFConfirm.text = `現在シートに記入している内容で<strong>${self.pdfDatas.length}ページ</strong>のPDFを作成します。<br><small>(未入力の項目がある行は無視されます。)</small><br><br> PDFを作成してよろしいですか？`,
+          self.createPDFConfirm.visible = true;
         if (!_.isNull(hot)) {
           let datas = hot.getData();
           self.pdfDatas = [];
@@ -224,7 +216,6 @@
       },
       createPDF: function() {
         let self = this;
-        self.alertModalText = '';
         $('#js-pdf-create-confirmation').modal('hide');
         if (!_.isEmpty(self.pdfDatas)) {
           let datajson = JSON.stringify(self.pdfDatas);
@@ -233,26 +224,32 @@
           xhr.setRequestHeader('Content-Type', 'application/json');
           xhr.responseType = 'arraybuffer';
           xhr.onprogress = function(ev) {
-             $('#alert').modal('show');
-            let percent =  Math.floor(parseInt(ev.loaded/ev.total*10000)/100);
-            self.alertModalText ='PDFを作成しています。そのまましばらくお待ちください。<br><br><div class="progress"><div class="progress-bar" role="progressbar" style="width: '+percent+'%;">'+percent+'%</div></div>';
-            
+            self.createPDFAlert.visible = true
+            let percent = Math.floor(parseInt(ev.loaded / ev.total * 10000) / 100);
+            self.createPDFAlert.title = '処理中'
+            self.createPDFAlert.text = 'PDFを作成しています。そのまましばらくお待ちください。<br><br><div class="progress"><div class="progress-bar" role="progressbar" style="width: ' + percent + '%;">' + percent + '%</div></div>';
+  
           }
           xhr.onloadend = function() {
-             $('#alert').modal('show');
-            if(this.status === 200){
+            self.createPDFAlert.visible = true
+            if (this.status === 200) {
               let arrayBuffer = this.response;
-              let blob_url = window.URL.createObjectURL(new Blob([arrayBuffer], {type: 'application/pdf'}));
-              self.alertModalText = 'PDFを作成しました。<a href="'+blob_url+'" target="_blank">ファイルを開く</a><br><br><div class="progress"><div class="progress-bar" role="progressbar" style="width: 100%;">100%</div></div>'
-            }else{
-              self.alertModalText = 'エラーステータス：'+this.status+'<br><br>PDFの作成時にエラーが発生しました。<br>お手数ですが、しばらくたってからもう一度お試しください。'
+              let blob_url = window.URL.createObjectURL(new Blob([arrayBuffer], {
+                type: 'application/pdf'
+              }));
+              self.createPDFAlert.title = '完了'
+              self.createPDFAlert.text = 'PDFを作成しました。<a href="' + blob_url + '" target="_blank">ファイルを開く</a><br><br><div class="progress"><div class="progress-bar" role="progressbar" style="width: 100%;">100%</div></div>'
+            } else {
+              self.createPDFAlert.title = 'エラー'
+              self.createPDFAlert.text = 'エラーステータス：' + this.status + '<br><br>PDFの作成時にエラーが発生しました。<br>お手数ですが、しばらくたってからもう一度お試しください。'
             }
-            
+  
           };
           xhr.send(datajson);
         } else {
-          self.alertModalText = 'PDFは作成できませんでした。<br>作成するPDFが0ページです。未入力の項目はございませんか？<br><small>(未入力の項目がある行は無視されます。)</small>'
-          $('#alert').modal('show');
+          self.createPDFAlert.title = 'エラー'
+          self.createPDFAlert.text = 'PDFは作成できません。<br>作成するPDFが0ページです。未入力の項目はございませんか？<br><small>(未入力の項目がある行は無視されます。)</small>'
+          self.createPDFAlert.visible = true
         }
       }
     },
@@ -263,22 +260,23 @@
       let parser = new UAParser();
       parser.setUA(window.navigator.userAgent);
       let result = parser.getResult();
-      if(result.device.type === 'mobile' || result.device.type === 'tablet'){
-        alert('本サービスはスマートフォン、タブレットでの動作を想定していません。快適に操作するためにはPCからアクセスしてください。'); 
+      if (result.device.type === 'mobile' || result.device.type === 'tablet') {
+        alert('本サービスはスマートフォン、タブレットでの動作を想定していません。快適に操作するためにはPCからアクセスしてください。');
       }
     },
     beforeUpdate: function() {},
     updated: function() {},
-    components:{
-      UserTerm
+    components: {
+      UserTerm,
+      Modal
     }
   }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   #app {
-    .black{
-      color:#000;
+    .black {
+      color: #000;
     }
     #menu {
       margin-top: 20px;
@@ -291,7 +289,8 @@
       background-color: #d9534f !important;
     }
   }
-  .introjs-tooltip{
+  
+  .introjs-tooltip {
     max-width: 400px !important;
     min-width: 300px !important;
   }
