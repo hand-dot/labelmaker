@@ -91,6 +91,8 @@
   import 'intro.js/introjs.css';
   import letterpack from '../table_settings/letter-pack';
   import UserTerm from './UserTerm.vue';
+  import formatter from '../utils/address-formatter'
+
   let hot;
   let tour = introJs();
   tour.setOption('nextLabel', '次へ');
@@ -146,7 +148,6 @@
               $.get(query,function(data){
                 let result = data.results[0];
                 if(result !== undefined){
-                  let addressArr = result.address_components;
                   let addresProp = (function(){
                     if(prop === 'toPost'){
                       return 'toAddres';
@@ -155,7 +156,7 @@
                     }
                   }());
                   if(_.isEmpty(hot.getDataAtRowProp(row, addresProp))){
-                    hot.setDataAtRowProp(row, addresProp, addressArr[3].long_name+addressArr[2].long_name+addressArr[1].long_name);
+                    hot.setDataAtRowProp(row, addresProp, formatter.formatGoogleApisAddress(result));
                   }
                 }else{//住所の結果なし
                   self.alertModalText = '該当する郵便番号がありませんでした。'
