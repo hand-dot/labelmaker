@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties
-public class Config {
+public class PropertiesConfig {
     private String outputWorkDir;
     private int maxPageNum;
 

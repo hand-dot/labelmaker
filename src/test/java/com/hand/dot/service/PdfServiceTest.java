@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.hand.dot.config.Config;
+import com.hand.dot.config.PropertiesConfig;
 import com.hand.dot.data.templates.LetterPack;
 import com.hand.dot.data.templates.PdfTemplate;
 
@@ -22,7 +22,7 @@ import com.hand.dot.data.templates.PdfTemplate;
 public class PdfServiceTest {
 
 	@Autowired
-	private Config config;
+	private PropertiesConfig config;
     @Autowired
     private PdfService pdfService;
 

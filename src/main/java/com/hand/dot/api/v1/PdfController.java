@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hand.dot.config.Config;
+import com.hand.dot.config.PropertiesConfig;
 import com.hand.dot.data.templates.LetterPack;
 import com.hand.dot.service.PdfService;
 
@@ -28,7 +28,7 @@ public class PdfController {
 	@Autowired
 	private PdfService pdfService;
 	@Autowired
-	private Config config;
+	private PropertiesConfig config;
 
 	@RequestMapping(value = "/api/v1/letterpack", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> post(@RequestBody List<LetterPack> letterpackList) throws IOException {

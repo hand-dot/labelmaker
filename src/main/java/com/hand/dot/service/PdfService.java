@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.hand.dot.config.Config;
+import com.hand.dot.config.PropertiesConfig;
 import com.hand.dot.data.templates.PdfTemplate;
 import com.hand.dot.util.FileUtil;
 import com.hand.dot.util.PdfUtil;
@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PdfService {
 
 	@Autowired
-	private Config config;
+	private PropertiesConfig config;
 
 	final String pdfExtension = "pdf";
 	final String pdfTemplatesDir = "/pdf-templates/";
