@@ -116,7 +116,7 @@
     methods: {
       startTutorial:function(){
         tour.start().oncomplete(function() {
-          window.open('./example.pdf?multipage=true','about:blank');
+          window.open('./assets/pdf/example.pdf?multipage=true','about:blank');
         });
       },
       initTable:function(){
