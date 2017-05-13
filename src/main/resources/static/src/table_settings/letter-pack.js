@@ -6,8 +6,8 @@ export default {
     columns: [{
             data: 'toPost',
             value: '[To]郵便番号',
-            validator: /^\d{7}$/,
-            comment: '半角数字7桁で入力してください\n\n[To]おところの欄が空欄の場合、\n郵便番号から自動入力します。',
+            validator: /^\d{3}[-]\d{4}$|^\d{7}$/,
+            comment: '半角数字7桁で入力してください\n\n[To]おところが空欄の場合、\n郵便番号入力後に[To]おところを自動入力します。',
         },
         {
             data: 'toAddres',
@@ -25,8 +25,8 @@ export default {
         {
             data: 'fromPost',
             value: '[From]郵便番号',
-            validator: /^\d{7}$/,
-            comment: '半角数字7桁で入力してください\n\n[From]おところの欄が空欄の場合、\n郵便番号から自動入力します。',
+            validator: /^\d{3}[-]\d{4}$|^\d{7}$/,
+            comment: '半角数字7桁で入力してください\n\n[From]おところが空欄の場合、\n郵便番号入力後に[From]おところを自動入力します。',
         },
         {
             data: 'fromAddres',

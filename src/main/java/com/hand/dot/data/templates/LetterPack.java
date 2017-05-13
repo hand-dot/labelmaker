@@ -27,7 +27,7 @@ public class LetterPack extends PdfTemplate{
 		return toPost;
 	}
 	public void setToPost(String toPost) {
-		this.toPost = StringUtil.appendWithSeparators(toPost);
+		this.toPost = StringUtil.appendWithSeparators(StringUtil.removeHyphen(toPost));
 	}
 	public String getToAddres() {
 		return toAddres;
@@ -55,7 +55,7 @@ public class LetterPack extends PdfTemplate{
 		return fromPost;
 	}
 	public void setFromPost(String fromPost) {
-		this.fromPost = StringUtil.appendWithSeparators(fromPost);
+		this.fromPost = StringUtil.appendWithSeparators(StringUtil.removeHyphen(fromPost));
 	}
 	public String getFromAddres() {
 		return fromAddres;

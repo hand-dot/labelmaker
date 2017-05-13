@@ -142,7 +142,7 @@
           },
           afterValidate:function(isValid,value,row,prop,source){
             if(isValid && _.includes(['toPost','fromPost'],prop)){
-              let query = "https://maps.googleapis.com/maps/api/geocode/json?address="+value+"&language=ja";
+              let query = "https://maps.googleapis.com/maps/api/geocode/json?address="+value.replace( /-/g , '' )+"&language=ja";
               $.get(query,function(data){
                 let result = data.results[0];
                 if(result !== undefined){
@@ -150,7 +150,7 @@
                   let addresProp = (function(){
                     if(prop === 'toPost'){
                       return 'toAddres';
-                    }else{
+                    }else if(prop === 'fromPost'){
                       return 'fromAddres';
                     }
                   }());

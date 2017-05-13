@@ -27,11 +27,11 @@ public class PdfServiceTest {
     private PdfService pdfService;
 
 	@Test
-	@Ignore
+//	@Ignore
 	public void fillInFieldByTemplate() {
 		File dir = new File(config.getOutputWorkDir());
 		LetterPack letterPack = new LetterPack();
-		letterPack.setToPost("1234567");
+		letterPack.setToPost("123-4567");
 		letterPack.setToAddres("東京都東京1-2-3-4 東京マンション123号");
 		letterPack.setToName("東京都 出得太");
 		letterPack.setToTel("123-3456-7890");
