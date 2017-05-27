@@ -275,9 +275,6 @@
 
 <style lang="scss" scoped>
   #app {
-    .black {
-      color: #000;
-    }
     #menu {
       margin-top: 20px;
       margin-bottom: 10px;

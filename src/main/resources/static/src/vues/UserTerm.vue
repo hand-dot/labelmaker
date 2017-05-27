@@ -1,6 +1,6 @@
 <template>
 <div>
-    <p class="text-right" @click="showUserTerms"><a class="black">利用規約</a></p>
+    <p class="text-right" @click="showUserTerms"><a class="black pointer">利用規約</a></p>
     <div class="modal fade" id="js-user-term-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -128,5 +128,13 @@
   }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+  #app {
+    .black {
+      color: #000;
+    }
+    .pointer{
+        cursor: pointer;
+    }
+  }
 </style>
