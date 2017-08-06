@@ -3,10 +3,14 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content text-center">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="confirmationLabel"><strong>{{options.title}}</strong></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="confirmationLabel">
+                        <strong>{{options.title}}</strong>
+                    </h4>
                 </div>
-                <div class="modal-body" v-html="options.text">{{options.text}}</div>                
+                <div class="modal-body" v-html="options.text">{{options.text}}</div>
                 <div class="modal-footer" v-if="options.confirm">
                     <button type="button" class="btn btn-default" data-dismiss="modal" v-on:click.prevent="cancel">いいえ</button>
                     <button type="button" class="btn btn-primary" v-on:click.prevent="ok">はい</button>
@@ -17,18 +21,18 @@
 </template>
 
 <script>
-  global.jQuery = require('jquery');
-  const $ = global.jQuery;
-  require('bootstrap');
-  import 'bootstrap/dist/css/bootstrap.css';
-  import uuid from 'uuid';
+global.jQuery = require('jquery');
+const $ = global.jQuery;
+require('bootstrap');
+import 'bootstrap/dist/css/bootstrap.css';
+import uuid from 'uuid';
 
-  export default {
+export default {
     name: 'modal',
     data() {
-      return {
-        id: null
-      }
+        return {
+            id: null
+        }
     },
     props: {
         options: Object
@@ -39,29 +43,29 @@
         // options.confirm:false,
     },
     methods: {
-        open: function() {
+        open: function () {
             let self = this;
             $(`#${this.id}`).on('hidden.bs.modal', function () {
                 self.options.visible = false; // ESCで閉じたときにこれが必要となる
             }).modal('show');
         },
-        close: function() {
+        close: function () {
             $(`#${this.id}`).modal('hide');
         },
-        ok: function() {
+        ok: function () {
             this.options.visible = false;
             this.$emit('ok');
         },
-        cancel: function() {
+        cancel: function () {
             this.options.visible = false;
             this.$emit('cancel');
         }
     },
-    created: function() {
+    created: function () {
         this.id = `message-${uuid()}`;
     },
     watch: {
-        'options.visible': function() {
+        'options.visible': function () {
             if (this.options.visible) {
                 this.open();
             } else {
@@ -69,12 +73,13 @@
             }
         }
     },
-    mounted: function() {},
-    beforeUpdate: function() {},
-    updated: function() {},
-    components:{}
-  }
+    mounted: function () { },
+    beforeUpdate: function () { },
+    updated: function () { },
+    components: {}
+}
 </script>
 
 <style lang="scss" scoped>
+
 </style>
