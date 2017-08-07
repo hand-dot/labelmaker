@@ -8,7 +8,7 @@
               <label>初めての方</label>
               <button @click="startTutorial" type="button" class="btn btn-default">使い方を見る</button>
             </div>
-            <div class="col-xs-4">
+            <div class="col-xs-2">
               <label>テンプレートを選択</label>
               <select data-intro="作成したいテンプレートを選択してください。<br><br>(現在レターパックのみ)" data-step="2" name="template" v-model="selected" 　@change="selectTemplate" class="form-control">
                 <option value="letterpack">レターパック</option>
@@ -25,6 +25,10 @@
             <div class="col-xs-2">
               <label>シートをリセット</label>
               <button type="button" class="btn btn-default" @click="openClearTableConfirm">リセットする</button>
+            </div>
+            <div class="col-xs-2">
+              <label>ご意見ご要望</label>
+              <button @click="goForm" type="button" class="btn btn-default">問い合わせる</button>
             </div>
           </div>
         </div>
@@ -308,6 +312,9 @@ export default {
         self.createPDFAlert.text = 'PDFは作成できません。<br>作成するPDFが0ページです。未入力の項目はございませんか？<br><small>(未入力の項目がある行は無視されます。)</small>'
         self.createPDFAlert.visible = true
       }
+    },
+    goForm:function(){
+      window.open('https://goo.gl/forms/Ne5RmXACzWpvaQRo2');
     }
   },
   created: function () {
